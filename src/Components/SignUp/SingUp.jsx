@@ -1,18 +1,63 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "./SignUp.css";
+import {
+  GoogleAuthProvider,
+  getAuth,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import app from "../firebase/firebase.config";
+
+const auth = getAuth(app);
 
 const SingUp = () => {
+  const [user, setUser] = useState(null);
+
+  // ============== GOOGLE SIGN UP METHOD =================== //
+  const googleProvider = new GoogleAuthProvider();
+  const handleGoogleSignIn = () => {
+    signInWithPopup(auth, googleProvider)
+      .then((res) => {
+        console.log(res.user);
+        const loggedUser = res.user;
+        setUser(loggedUser);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        setUser(null);
+      })
+      .then((err) => {
+        console.log(err);
+      });
+  };
+  // ========================================================= //
+
   return (
     <div className="container my-5 ">
-      <h3 className="text-center text-primary">Please create an account!</h3>
-      {/* FORM FROM BOOTSTRAP */}
+      <div className="text-center  mb-4 w-75 mx-auto p-3">
+        {user && (
+          <div>
+            <h1>{user.displayName}</h1>
+            <h4> {user.email}</h4>
+          </div>
+        )}
 
+        {user ? <button onClick={handleSignOut}> Sign Out </button> : ""}
+      </div>
+
+      <h3 className="text-center text-primary">Please create an account!</h3>
+
+      {/* FORM FROM BOOTSTRAP */}
       <div className="shadow rounded w-75 mx-auto my-5 p-5">
         <Form>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>User Name</Form.Label>
+          <Form.Group className="mb-3">
             <Form.Control
               type="email"
               name="name"
@@ -21,8 +66,7 @@ const SingUp = () => {
               required
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Email address</Form.Label>
+          <Form.Group className="mb-3">
             <Form.Control
               type="email"
               name="email"
@@ -31,8 +75,7 @@ const SingUp = () => {
               required
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>Password</Form.Label>
+          <Form.Group className="mb-3">
             <Form.Control
               type="password"
               name="password"
@@ -55,7 +98,10 @@ const SingUp = () => {
           </p>
         </div>
 
-        <div className="google w-75 mx-auto d-flex align-items-center justify-content-center">
+        <div
+          onClick={handleGoogleSignIn}
+          className="google w-75 mx-auto d-flex align-items-center justify-content-center"
+        >
           <img className="mx-3" src="google.png" alt="" />
           <p className="pt-3  fs-4">Google sign up</p>
         </div>
