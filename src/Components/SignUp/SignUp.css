@@ -1,0 +1,11 @@
+.google,
+.github {
+  border: 1px solid #4081ec;
+  border-radius: 5%;
+}
+
+.google img,
+.github img {
+  width: 2rem;
+  height: 2rem;
+}

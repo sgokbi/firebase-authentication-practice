@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import "./SignUp.css";
 
 const SingUp = () => {
   return (
@@ -54,9 +55,14 @@ const SingUp = () => {
           </p>
         </div>
 
-        <div className="d-flex justify-content-center mt-4">
-          <button className="btn btn-danger mx-2">Google sign up</button>
-          <button className="btn btn-success mx-2">Github sign up</button>
+        <div className="google w-75 mx-auto d-flex align-items-center justify-content-center">
+          <img className="mx-3" src="google.png" alt="" />
+          <p className="pt-3  fs-4">Google sign up</p>
+        </div>
+
+        <div className="google w-75 mx-auto d-flex align-items-center justify-content-center mt-3">
+          <img className="mx-3" src="github.png" alt="" />
+          <p className="pt-3 fs-4">Github sign up</p>
         </div>
       </div>
     </div>
