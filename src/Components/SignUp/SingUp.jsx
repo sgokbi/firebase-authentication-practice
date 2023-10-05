@@ -3,6 +3,7 @@ import { Button, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "./SignUp.css";
 import {
+  GithubAuthProvider,
   GoogleAuthProvider,
   getAuth,
   signInWithPopup,
@@ -37,7 +38,22 @@ const SingUp = () => {
         console.log(err);
       });
   };
+
   // ========================================================= //
+  // ============== GITHUB SIGN UP METHOD =================== //
+
+  const githubProvider = new GithubAuthProvider();
+  const handleGithubSignIn = () => {
+    signInWithPopup(auth, githubProvider)
+      .then((res) => {
+        console.log(res.user);
+        const loggedUser = res.user;
+        setUser(loggedUser);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
 
   return (
     <div className="container my-5 ">
@@ -106,7 +122,10 @@ const SingUp = () => {
           <p className="pt-3  fs-4">Google sign up</p>
         </div>
 
-        <div className="google w-75 mx-auto d-flex align-items-center justify-content-center mt-3">
+        <div
+          onClick={handleGithubSignIn}
+          className="google w-75 mx-auto d-flex align-items-center justify-content-center mt-3"
+        >
           <img className="mx-3" src="github.png" alt="" />
           <p className="pt-3 fs-4">Github sign up</p>
         </div>
