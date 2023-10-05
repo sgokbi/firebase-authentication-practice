@@ -5,9 +5,12 @@ import "./SignUp.css";
 import {
   GithubAuthProvider,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
   getAuth,
+  sendEmailVerification,
   signInWithPopup,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import app from "../firebase/firebase.config";
 
@@ -29,15 +32,6 @@ const SingUp = () => {
         console.log(error);
       });
   };
-  const handleSignOut = () => {
-    signOut(auth)
-      .then(() => {
-        setUser(null);
-      })
-      .then((err) => {
-        console.log(err);
-      });
-  };
 
   // ========================================================= //
   // ============== GITHUB SIGN UP METHOD =================== //
@@ -52,6 +46,84 @@ const SingUp = () => {
       })
       .catch((error) => {
         console.log(error.message);
+      });
+  };
+
+  // ========================================================= //
+  // ============== EMAIL PASSWORD SIGN UP / REGISTER METHOD =========== //
+
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const name = e.target.name.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    console.log(name, email, password);
+
+    // validate
+    if (!/(?=.*[A-Z])/.test(password)) {
+      setError("please add at least one uppercase");
+      return;
+    } else if (!/(?=.*[0-9].*[0-9])/.test(password)) {
+      setError("please add at lest two numbers");
+      return;
+    } else if (!/(?=.*[!@#$%^&*])/.test(password)) {
+      setError("please add one special character");
+      return;
+    } else if (password.length < 6) {
+      setError("Please add at least 6 characters in your password");
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((res) => {
+        const loggedUser = res.user;
+        console.log(loggedUser);
+        setSuccess("successfully created account");
+        setError("");
+
+        handleEmailVerification(res.user);
+        handleUserUpdate(res.user, name);
+
+        // reset the form
+        e.target.reset();
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
+
+  const handleUserUpdate = (currentUser, name) => {
+    updateProfile(currentUser, {
+      displayName: name,
+    })
+      .then(() => {
+        console.log("user name updated");
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
+
+  const handleEmailVerification = (currentUser) => {
+    sendEmailVerification(currentUser).then((res) => {
+      console.log(res);
+      alert("please verify your email");
+    });
+  };
+
+  // ========================================================= //
+  // ============== SIGN OUT METHOD =========== //
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        setUser(null);
+      })
+      .then((err) => {
+        console.log(err);
       });
   };
 
@@ -72,13 +144,13 @@ const SingUp = () => {
 
       {/* FORM FROM BOOTSTRAP */}
       <div className="shadow rounded w-75 mx-auto my-5 p-5">
-        <Form>
+        <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Control
-              type="email"
+              type="text"
               name="name"
               id="name"
-              placeholder="Enter email"
+              placeholder="Enter user name"
               required
             />
           </Form.Group>
@@ -107,6 +179,8 @@ const SingUp = () => {
         </Form>
 
         <div className=" mt-4">
+          <p className="text-danger">{error}</p>
+          <p className="text-success">{success}</p>
           <p>
             <small>
               Already have an account? <Link to="/login">Login</Link> Please.
